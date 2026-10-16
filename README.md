@@ -27,6 +27,23 @@ combinability (non-combinable ones compete: the biggest wins). Registers the `di
 the order is kept, the redemption recorded and a `discount_over_limit` event is added to the order timeline for review.
 Tables: `discounts`, `discount_redemptions`.
 
+## Setup
+
+After `genpm add`, follow these steps (your AI agent finds the same steps in `src/lib/discounts/AGENTS.md` and can do them for you):
+
+1. Migrations as in `src/lib/db/AGENTS.md`. Import this module at startup (it registers its steps and handler).
+2. Cart page: a code field calling `PUT /api/cart/codes {codes: [code]}` (@core/cart); show `totals.discounts` and any `invalid_code` issues.
+3. Pass the customer email to `computeTotals(cart, { email })` once known so per-customer and first-order limits apply.
+4. Add `discountsAdminResource` to `src/genpm/admin.ts` (permissions `discounts:read|update`).
+5. Verify: create `TEN` (10 %), apply it, the total drops and each line shows its share.
+
+## What's inside
+
+Paths are relative to `src/lib/discounts`.
+
+- `index.ts` — public API: `upsertDiscount`, `DiscountInput`, `discountsStep`, `freeShippingStep`, `recordRedemptions`, `discountsAdminResource`.
+- `discounts.ts` — validation, application and the redemption handler (registered on import). `admin.ts` — admin resource.
+
 ## At a glance
 
 - **GenPM dependencies** (installed with it): [@core/db](https://genpm.net/p/@core/db), [@core/cart](https://genpm.net/p/@core/cart), [@core/catalog](https://genpm.net/p/@core/catalog), [@core/orders](https://genpm.net/p/@core/orders), [@core/money](https://genpm.net/p/@core/money)
